@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { isAuthenticated } from "lib/authenticate";
 
-const PUBLIC_PATHS = ["/register", '/login', '/', '/_error'];
+const PUBLIC_PATHS = ["/register", "/login", "/", "/_error"];
 
 export default function RouteGuard(props: any) {
 	const router = useRouter();
@@ -29,9 +29,14 @@ export default function RouteGuard(props: any) {
 
 	function authCheck(url: string) {
 		const path = url.split("?")[0];
-		if (!PUBLIC_PATHS.includes(path) && !isAuthenticated()) {
+		if (!PUBLIC_PATHS.includes(path)) {
 			console.log(`trying to request a secure path: ${path}`);
-			router.push('/login');
+			if (isAuthenticated()) {
+				console.log("authenticated");
+				return;
+			} else {
+				router.push("/login");
+			}
 		}
 	}
 
