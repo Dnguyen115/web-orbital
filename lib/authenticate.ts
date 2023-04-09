@@ -16,6 +16,11 @@ export function getToken() {
 	}
 }
 
+export function readToken(): any | null {
+	let token = getToken();
+	return token? jwt_decode(token): null;
+}
+
 export function isAuthenticated() {
 	const token = getToken();
 	return token ? true : false;

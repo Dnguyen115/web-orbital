@@ -5,7 +5,9 @@ import { useState } from "react";
 import { searchHistoryAtom } from "store";
 import { useAtom } from "jotai";
 import { addToHistory } from "lib/userData";
-import { getToken, isAuthenticated, removeToken } from "lib/authenticate";
+import { getToken, isAuthenticated, readToken, removeToken } from "lib/authenticate";
+import jwt_decode from 'jwt-decode';
+
 
 export default function MainNav() {
 	const router = useRouter();
@@ -97,7 +99,7 @@ export default function MainNav() {
 						&nbsp;
 						{isAuthenticated() ? (
 							// Due to the Token is extremely long, i shorted it to just 15 chars
-							<NavDropdown title={getToken()?.substring(0, 15)} id="basic-nav-dropdown">
+							<NavDropdown title={readToken()?.userName} id="basic-nav-dropdown">
 								<Link href="/favourites" legacyBehavior passHref>
 									<NavDropdown.Item
 										onClick={() => {
