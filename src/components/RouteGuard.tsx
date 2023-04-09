@@ -1,23 +1,38 @@
-
 import { favouritesAtom, searchHistoryAtom } from "store";
 import { getFavourites, getHistory } from "lib/userData";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
-const PUBLIC_PATH = ["/register"]
+const PUBLIC_PATHS = ["/register", '/login', '/', '/_error'];
 
 export default function RouteGuard(props: any) {
+	const router = useRouter();
 	const [favourites, setFavourites]: [object[], any] = useAtom(favouritesAtom);
 	const [searchHistory, setSearchHistory]: [object[], any] = useAtom(searchHistoryAtom);
 
-	async function updateAtoms() {
-		setFavourites(await getFavourites());
-		setSearchHistory(await getHistory());
-	}
-
 	useEffect(() => {
+		async function updateAtoms() {
+			setFavourites(await getFavourites());
+			setSearchHistory(await getHistory());
+		}
+
 		updateAtoms();
-	}, [favourites, searchHistory]);
+
+		authCheck(router.pathname);
+		router.events.on("routeChangeComplete", authCheck);
+		return () => {
+			router.events.off("routeChangeComplete", authCheck);
+		};
+	}, [favourites, router.events, router.pathname, searchHistory]);
+
+	function authCheck(url: string) {
+		const path = url.split("?")[0];
+		if (!PUBLIC_PATHS.includes(path)) {
+			console.log(`trying to request a secure path: ${path}`);
+			router.push('/login');
+		}
+	}
 
 	return <>{props.children}</>;
 }
