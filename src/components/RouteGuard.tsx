@@ -3,6 +3,7 @@ import { getFavourites, getHistory } from "lib/userData";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { isAuthenticated } from "lib/authenticate";
 
 const PUBLIC_PATHS = ["/register", '/login', '/', '/_error'];
 
@@ -28,7 +29,7 @@ export default function RouteGuard(props: any) {
 
 	function authCheck(url: string) {
 		const path = url.split("?")[0];
-		if (!PUBLIC_PATHS.includes(path)) {
+		if (!PUBLIC_PATHS.includes(path) && !isAuthenticated()) {
 			console.log(`trying to request a secure path: ${path}`);
 			router.push('/login');
 		}
